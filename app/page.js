@@ -127,24 +127,32 @@ function GameContent() {
   };
 
   const iniciarJuego = async () => {
-    // Elegimos la primera palabra al azar antes de empezar
-    const initialWord = PALABRAS_PICTUREKA[Math.floor(Math.random() * PALABRAS_PICTUREKA.length)].nombre;
+    console.log("Intentando iniciar juego en sala:", roomParam);
+    
+    // Elegimos la primera palabra
+    const randomItem = PALABRAS_PICTUREKA[Math.floor(Math.random() * PALABRAS_PICTUREKA.length)];
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('sesiones_juego')
       .update({ 
         status: 'PLAYING', 
-        objetivo_actual: initialWord,
+        objetivo_actual: randomItem.nombre,
         cronometro: 15,
         puntos_a: 0,
         puntos_b: 0,
-        ronda_actual: 1
+        ronda_actual: 1,
+        turno_de: 'jugador_a'
       })
-      .eq('room_id', roomParam); // Usamos roomParam que es el código de 4 dígitos
+      .eq('room_id', roomParam)
+      .select(); // El .select() nos ayuda a confirmar si se actualizó algo
 
     if (error) {
-      console.error("Error starting game:", error);
-      alert("No se pudo iniciar el juego. Revisa la consola.");
+      console.error("Error de Supabase:", error);
+      alert("Error de base de datos: " + error.message);
+    } else if (data && data.length === 0) {
+      alert("No se encontró la sala en la base de datos para actualizar.");
+    } else {
+      console.log("Juego iniciado con éxito:", data);
     }
   };
 
