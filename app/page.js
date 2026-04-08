@@ -65,18 +65,27 @@ function GameContent() {
   }, [game?.objetivo_actual, game?.status]);
 
   // 3. CRONÓMETRO CORREGIDO (Solo corre para el Jugador A)
+  // 3. CRONÓMETRO INDESTRUCTIBLE
   useEffect(() => {
+    let timer;
     if (game?.status === 'PLAYING' && soyElJugador === 'A') {
       if (game.cronometro > 0) {
-        const timer = setTimeout(() => {
-          supabase.from('sesiones_juego').update({ cronometro: game.cronometro - 1 }).eq('room_id', roomParam);
+        timer = setTimeout(() => {
+          // Usamos la sala actual para bajar el tiempo
+          supabase
+            .from('sesiones_juego')
+            .update({ cronometro: game.cronometro - 1 })
+            .eq('room_id', roomParam)
+            .then(({ error }) => {
+               if(error) console.error("Error cronómetro:", error);
+            });
         }, 1000);
-        return () => clearTimeout(timer);
       } else {
         manejarCambioRonda();
       }
     }
-  }, [game?.cronometro, game?.status]);
+    return () => clearTimeout(timer);
+  }, [game?.cronometro, game?.status, soyElJugador, roomParam]); // Agregamos todas las dependencias
 
   const crearSala = async () => {
     const code = Math.floor(1000 + Math.random() * 9000).toString();
