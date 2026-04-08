@@ -94,35 +94,32 @@ function GameContent() {
 
   // 4. FUNCIONES DE NAVEGACIÓN Y ESTADO
   const crearSala = async () => {
-    // Generamos el código y la palabra antes de subir a la DB
-    const code = Math.floor(1000 + Math.random() * 9000).toString();
-    const randomItem = PALABRAS_PICTUREKA[Math.floor(Math.random() * PALABRAS_PICTUREKA.length)];
-    const word = randomItem.nombre;
+    try {
+      const code = Math.floor(1000 + Math.random() * 9000).toString();
+      const randomItem = PALABRAS_PICTUREKA[Math.floor(Math.random() * PALABRAS_PICTUREKA.length)];
+      
+      const { error } = await supabase.from('sesiones_juego').insert([
+        {
+          room_id: code,
+          status: 'LOBBY',
+          nombre_a: nombreA || 'Teacher',
+          nombre_b: nombreB || 'Student',
+          max_rondas: parseInt(maxRondas) || 3,
+          objetivo_actual: randomItem.nombre,
+          cronometro: 15,
+          turno_de: 'jugador_a'
+        }
+      ]);
 
-    const { data, error } = await supabase.from('sesiones_juego').insert([
-      {
-        room_id: code,
-        status: 'LOBBY',
-        nombre_a: nombreA || 'Teacher', // Evitamos que vaya vacío
-        nombre_b: nombreB || 'Student',
-        max_rondas: parseInt(maxRondas) || 3,
-        objetivo_actual: word,
-        cronometro: 15,
-        turno_de: 'jugador_a',
-        puntos_a: 0,
-        puntos_b: 0,
-        ronda_actual: 1
-      }
-    ]).select();
+      if (error) throw error;
 
-    if (error) {
-      console.error("Error creating room:", error);
-      alert("Error creating room. Check Supabase columns.");
-      return;
+      // Usamos window.location.replace para forzar una carga limpia
+      window.location.search = `?room=${code}&jugador=A`;
+      
+    } catch (err) {
+      console.error("Error:", err);
+      alert("No se pudo crear la sala. Revisa la consola.");
     }
-
-    // Si todo sale bien, redirigimos
-    window.location.href = `?room=${code}&jugador=A`;
   };
 
   const unirseASala = () => {
@@ -179,16 +176,30 @@ function GameContent() {
     );
   }
 
-  // PANTALLA DE ESPERA (Con código de sala)
+
+// PANTALLA DE ESPERA (Lobby)
   if (game?.status === 'LOBBY') {
     return (
       <div className="min-h-screen bg-[#2db8bc] flex flex-col items-center justify-center text-white p-6 text-center">
-        <span className="text-[#152239] font-black uppercase tracking-widest text-sm mb-2">Share this code:</span>
-        <div className="text-8xl font-black bg-[#152239] px-10 py-6 rounded-[3rem] mb-8 shadow-2xl shadow-black/30">{roomParam}</div>
+        <span className="text-[#152239] font-black uppercase tracking-widest text-sm mb-2">
+          {soyElJugador === 'A' ? "TU CÓDIGO DE CLASE:" : "ESPERANDO AL PROFESOR..."}
+        </span>
+        <div className="text-8xl font-black bg-[#152239] px-10 py-6 rounded-[3rem] mb-8 shadow-2xl">
+          {roomParam}
+        </div>
+        
         {soyElJugador === 'A' ? (
-          <button onClick={iniciarPartida} className="bg-[#abca25] text-[#152239] px-12 py-5 rounded-full font-black text-2xl shadow-xl hover:scale-105 transition-transform">START GAME</button>
+          <div className="space-y-4">
+            <p className="font-bold">¡Comparte el código con tu alumno!</p>
+            <button 
+              onClick={iniciarJuego} 
+              className="bg-[#abca25] text-[#152239] px-12 py-5 rounded-full font-black text-2xl shadow-xl hover:scale-105 transition-transform"
+            >
+              START GAME
+            </button>
+          </div>
         ) : (
-          <p className="animate-pulse font-bold text-xl">Waiting for teacher to start...</p>
+          <p className="animate-pulse font-bold text-xl uppercase">The teacher will start soon...</p>
         )}
       </div>
     );
