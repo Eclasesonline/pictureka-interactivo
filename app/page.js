@@ -101,7 +101,28 @@ function GameContent() {
     window.location.search = `?room=${inputRoom}&jugador=B`;
   };
 
-  const iniciarJuego = () => supabase.from('sesiones_juego').update({ status: 'PLAYING' }).eq('room_id', roomParam);
+  const iniciarJuego = async () => {
+    // 1. Elegimos una palabra al azar para empezar
+    const randomWord = PALABRAS_PICTUREKA[Math.floor(Math.random() * PALABRAS_PICTUREKA.length)].nombre;
+
+    // 2. Intentamos actualizar el estado en Supabase
+    const { error } = await supabase
+      .from('sesiones_juego')
+      .update({ 
+        status: 'PLAYING', 
+        objetivo_actual: randomWord,
+        cronometro: 15,
+        puntos_a: 0,
+        puntos_b: 0,
+        ronda_actual: 1,
+        turno_de: 'jugador_a'
+      })
+      .eq('room_id', roomParam);
+
+    if (error) {
+      alert("Error al iniciar: " + error.message);
+    }
+  };
 
   const manejarGolpe = async (mote) => {
     const miTurno = (soyElJugador === 'A' && game.turno_de === 'jugador_b') || (soyElJugador === 'B' && game.turno_de === 'jugador_a');
