@@ -94,17 +94,34 @@ function GameContent() {
 
   // 4. FUNCIONES DE NAVEGACIÓN Y ESTADO
   const crearSala = async () => {
+    // Generamos el código y la palabra antes de subir a la DB
     const code = Math.floor(1000 + Math.random() * 9000).toString();
-    const word = PALABRAS_PICTUREKA[Math.floor(Math.random() * PALABRAS_PICTUREKA.length)].nombre;
-    await supabase.from('sesiones_juego').insert([{
-      room_id: code,
-      status: 'LOBBY',
-      nombre_a: nombreA,
-      nombre_b: nombreB,
-      max_rondas: maxRondas,
-      objetivo_actual: word,
-      cronometro: 15
-    }]);
+    const randomItem = PALABRAS_PICTUREKA[Math.floor(Math.random() * PALABRAS_PICTUREKA.length)];
+    const word = randomItem.nombre;
+
+    const { data, error } = await supabase.from('sesiones_juego').insert([
+      {
+        room_id: code,
+        status: 'LOBBY',
+        nombre_a: nombreA || 'Teacher', // Evitamos que vaya vacío
+        nombre_b: nombreB || 'Student',
+        max_rondas: parseInt(maxRondas) || 3,
+        objetivo_actual: word,
+        cronometro: 15,
+        turno_de: 'jugador_a',
+        puntos_a: 0,
+        puntos_b: 0,
+        ronda_actual: 1
+      }
+    ]).select();
+
+    if (error) {
+      console.error("Error creating room:", error);
+      alert("Error creating room. Check Supabase columns.");
+      return;
+    }
+
+    // Si todo sale bien, redirigimos
     window.location.href = `?room=${code}&jugador=A`;
   };
 
