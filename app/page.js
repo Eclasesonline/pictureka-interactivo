@@ -126,7 +126,27 @@ function GameContent() {
     if (inputRoom) window.location.href = `?room=${inputRoom}&jugador=B`;
   };
 
-  const iniciarJuego = () => supabase.from('sesiones_juego').update({ status: 'PLAYING' }).eq('room_id', roomParam);
+  const iniciarJuego = async () => {
+    // Elegimos la primera palabra al azar antes de empezar
+    const initialWord = PALABRAS_PICTUREKA[Math.floor(Math.random() * PALABRAS_PICTUREKA.length)].nombre;
+
+    const { error } = await supabase
+      .from('sesiones_juego')
+      .update({ 
+        status: 'PLAYING', 
+        objetivo_actual: initialWord,
+        cronometro: 15,
+        puntos_a: 0,
+        puntos_b: 0,
+        ronda_actual: 1
+      })
+      .eq('room_id', roomParam); // Usamos roomParam que es el código de 4 dígitos
+
+    if (error) {
+      console.error("Error starting game:", error);
+      alert("No se pudo iniciar el juego. Revisa la consola.");
+    }
+  };
 
   const resetGame = () => supabase.from('sesiones_juego').update({ 
     status: 'LOBBY', puntos_a: 0, puntos_b: 0, ronda_actual: 1, cronometro: 15 
