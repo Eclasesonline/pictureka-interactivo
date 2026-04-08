@@ -160,22 +160,22 @@ function GameContent() {
         <div className="grid md:grid-cols-2 gap-6 w-full max-w-3xl text-slate-800 font-sans">
           <div className="bg-white p-8 rounded-[2rem] shadow-2xl flex flex-col justify-between">
             <div>
-              <h3 className="font-black text-[#2db8bc] mb-4 uppercase text-sm">Teacher Panel</h3>
+              <h3 className="font-black text-[#2db8bc] mb-4 uppercase text-sm">Player one</h3>
               <input placeholder="Your Name" value={nombreA} onChange={e => setNombreA(e.target.value)} className="w-full p-3 mb-3 bg-slate-100 rounded-xl" />
               <div className="mb-4">
                 <label className="text-[10px] font-bold text-slate-400 uppercase">Rounds</label>
                 <input type="number" value={maxRondas} onChange={e => setMaxRondas(e.target.value)} className="w-full p-3 bg-slate-100 rounded-xl" />
               </div>
             </div>
-            <button onClick={crearSala} className="w-full bg-[#2db8bc] text-white p-4 rounded-xl font-black shadow-lg hover:scale-105 transition-all">CREATE ROOM</button>
+            <button onClick={crearSala} className="w-full bg-[#2db8bc] text-white p-4 rounded-xl font-black shadow-lg hover:scale-105 transition-all">CREATE GAME</button>
           </div>
           <div className="bg-white p-8 rounded-[2rem] shadow-2xl flex flex-col justify-between border-t-8 md:border-t-0 md:border-l-8 border-[#abca25]">
             <div>
-              <h3 className="font-black text-[#abca25] mb-4 uppercase text-sm">Student Panel</h3>
+              <h3 className="font-black text-[#abca25] mb-4 uppercase text-sm">Player two</h3>
               <input placeholder="Student Name" value={nombreB} onChange={e => setNombreB(e.target.value)} className="w-full p-3 mb-3 bg-slate-100 rounded-xl" />
               <input placeholder="4-Digit Code" value={inputRoom} onChange={e => setInputRoom(e.target.value)} className="w-full p-3 mb-4 bg-slate-100 rounded-xl ring-2 ring-[#abca25]/20" />
             </div>
-            <button onClick={unirseASala} className="w-full bg-[#abca25] text-[#152239] p-4 rounded-xl font-black shadow-lg hover:scale-105 transition-all">JOIN CLASS</button>
+            <button onClick={unirseASala} className="w-full bg-[#abca25] text-[#152239] p-4 rounded-xl font-black shadow-lg hover:scale-105 transition-all">JOIN GAME</button>
           </div>
         </div>
       </div>
@@ -197,7 +197,7 @@ function GameContent() {
     return (
       <div className="min-h-screen bg-[#f9b800] flex flex-col items-center justify-center p-6 text-[#152239] text-center">
         <h1 className="text-6xl font-black mb-4 uppercase">Lesson Over!</h1>
-        <h2 className="text-3xl font-black mb-10 bg-[#152239] text-white px-8 py-2 rounded-full">{ganador} wins!</h2>
+        <h2 className="text-3xl font-black mb-10 bg-[#152239] text-white px-8 py-2 rounded-full">{ganador} wins 🥳!</h2>
         <button onClick={() => window.location.search = ''} className="bg-[#152239] text-white px-10 py-4 rounded-2xl font-black">EXIT</button>
       </div>
     );
